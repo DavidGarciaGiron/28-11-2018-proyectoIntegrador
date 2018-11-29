@@ -10,16 +10,15 @@ class App extends Component {
         clientes: [],
         pos: null,
         titulo: 'Nuevo',
-        id_cliente: 1,
+        id_cliente: 0,
         nombre: '',
         correo: '',
-        dni: 0,
+        dni: '0',
         password: '',
         direccion: '',
         latitud: '0',
         longitud: '0'
       })
-
       this.cambioNombre = this.cambioNombre.bind(this);
       this.cambioCorreo = this.cambioCorreo.bind(this);
       this.cambioDni = this.cambioDni.bind(this);
@@ -35,9 +34,7 @@ class App extends Component {
   componentWillMount() {
       axios.get('https://integrador4tociclo-vicse.c9users.io/api/clientes/')
         .then((cli) => {
-          this.setState({
-            clientes: cli.data
-          })
+          this.setState({ clientes: cli.data })
         });
     }
 
@@ -63,7 +60,7 @@ class App extends Component {
             </tr>
           </thead>
           <tbody>
-            {this.state.clientes.map(cliente => {
+            {this.state.clientes.map( (cliente,index) => {
               return (
                 <tr key={cliente.id_cliente}>
                   <td>{cliente.nombre}</td>
@@ -74,7 +71,7 @@ class App extends Component {
                   <td>{cliente.latitud}</td>
                   <td>{cliente.longitud}</td>
                   <td>
-                    <button onClick={()=>this.mostrar(cliente.id_cliente)}>Editar</button>
+                    <button onClick={()=>this.mostrar(cliente.id_cliente,index)}>Editar</button>
                     <button onClick={()=>this.eliminar(cliente.id_cliente)}>Eliminar</button>
                   </td>
                 </tr>
@@ -89,7 +86,7 @@ class App extends Component {
             <input type="hidden" value={this.state.id_cliente} />
             <p>Ingrese nombre: <input type="text" value={this.state.nombre} onChange={this.cambioNombre} /></p>
             <p>Ingrese correo: <input type="email" value={this.state.correo} onChange={this.cambioCorreo} /></p>
-            <p>Ingrese dni: <input type="text" value={this.state.dni} onChange={this.cambioDni} /></p>
+            <p>Ingrese dni: <input type="number" value={this.state.dni} onChange={this.cambioDni} /></p>
             <p>Ingrese password: <input type="password" value={this.state.password} onChange={this.cambioPassword} /></p>
             <p>Ingrese direccion: <input type="text" value={this.state.direccion} onChange={this.cambioDireccion} /></p>
             <p>Ingrese latitud: <input type="number" value={this.state.latitud} onChange={this.cambioLatitud} /></p>
@@ -143,10 +140,11 @@ class App extends Component {
       })
     }
 
-    mostrar(cod){
+    mostrar(cod, index){
       axios.get('https://integrador4tociclo-vicse.c9users.io/api/clientes/'+cod+'/')
       .then(cli => {
         this.setState( {
+          pos:index,
           titulo: 'Editar',
           id_cliente: cli.data.id_cliente,
           nombre: cli.data.nombre,
@@ -175,7 +173,8 @@ class App extends Component {
       if(cod>0){ //Editamos un Registro
         axios.put('https://integrador4tociclo-vicse.c9users.io/api/clientes/'+cod+'/', datos)
         .then(cli => {
-
+          let indx = this.state.pos;
+          this.state.clientes[indx] = cli.data;
           var temp = this.state.clientes;
           this.setState( {
             pos: null,
@@ -183,11 +182,11 @@ class App extends Component {
             id_cliente: 0,
             nombre: '',
             correo: '',
-            dni: '',
+            dni: '0',
             password: '',
             direccion: '',
-            latitud: 0,
-            longitud: 0,
+            latitud: '0',
+            longitud: '0',
             clientes: temp
           });
         }).catch((error)=>{
@@ -202,11 +201,11 @@ class App extends Component {
             id_cliente: 0,
             nombre: '',
             correo: '',
-            dni: '',
+            dni: '0',
             password: '',
             direccion: '',
-            latitud: 0,
-            longitud: 0,
+            latitud: '0',
+            longitud: '0',
             clientes: temp
           });
         }).catch((error)=>{
